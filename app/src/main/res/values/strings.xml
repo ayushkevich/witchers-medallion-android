@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Witcher\'s Medallion</string>
+    <!-- Main Activity -->
+    <string name="main_tab">Main</string>
+    <string name="calibration_tab">RSSI Calibration</string>
+    <string name="mac_settings_tab">Monster Device Preferences</string>
+
+    <!-- Main -->
+    <string name="connection_status">Connection Status:</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="rssi">RSSI:</string>
+    <string name="scan_devices">Scan Devices</string>
+    <string name="stop_scan">Stop Scan</string>
+    <string name="scan_in_progress">Looking for Devices…</string>
+    <string name="disconnect">Disconnect</string>
+
+    <!-- Calibration -->
+    <string name="manual_calibration">Manual Calibration</string>
+    <string name="cold_warm">Cold</string>
+    <string name="warm_hot">Warm</string>
+    <string name="hot_found">Hot</string>
+    <string name="auto_calibration">Auto Calibration</string>
+    <string name="save_to_esp32">Save to Medallion</string>
+
+    <!-- MAC Tracking -->
+    <string name="mac_address">MAC Address</string>
+    <string name="add_mac">Add MAC</string>
+</resources>

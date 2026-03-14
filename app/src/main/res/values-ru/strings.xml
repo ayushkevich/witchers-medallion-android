@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Witcher\'s Medallion</string>
+    <!-- Main Activity -->
+    <string name="main_tab">Главная</string>
+    <string name="calibration_tab">Калибровка RSSI</string>
+    <string name="mac_settings_tab">Настройка устройства монстра</string>
+
+    <!-- Main -->
+    <string name="connection_status">Статус соединения:</string>
+    <string name="connected">Подключено</string>
+    <string name="disconnected">Не подключено</string>
+    <string name="rssi">RSSI:</string>
+    <string name="scan_devices">Поиск устройств</string>
+    <string name="stop_scan">Остановить сканирование</string>
+    <string name="scan_in_progress">Поиск устройств…</string>
+    <string name="disconnect">Отключить</string>
+
+    <!-- Calibration -->
+    <string name="manual_calibration">Ручная калибровка</string>
+    <string name="cold_warm">Холодно</string>
+    <string name="warm_hot">Тепло</string>
+    <string name="hot_found">Горячо</string>
+    <string name="auto_calibration">Авто калибюровка</string>
+    <string name="save_to_esp32">Загрузить в Медальон</string>
+
+    <!-- MAC Tracking -->
+    <string name="mac_address">MAC-адрес</string>
+    <string name="add_mac">Добавить MAC-адрес</string>
+</resources>
