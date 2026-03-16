@@ -3,70 +3,52 @@ package by.alexy.witchersmedallion.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexy.witchersmedallion.domain.BleConnectionState
+import by.alexy.witchersmedallion.domain.BleDevice
+import by.alexy.witchersmedallion.domain.BleScanConfig
 import by.alexy.witchersmedallion.repository.bluetooth.BleRepository
 import by.alexy.witchersmedallion.ui.state.MainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor (
+class MainViewModel @Inject constructor(
     private val bleRepository: BleRepository
 ) : ViewModel() {
+    val uiState: StateFlow<MainUiState> = combine(
+        bleRepository.scanningInProgress,
+        bleRepository.connectionState,
+        bleRepository.discoveredDevices.map { devices ->
+            devices.sortedWith(
+                compareByDescending<BleDevice> { it.rssi }
+                    .thenBy { it.name ?: "" }
+            )
+        }
+    ) { scanning, connectionState, sortedDevices ->
+        val isConnected = connectionState == BleConnectionState.CONNECTED
+        val isConnecting = connectionState == BleConnectionState.CONNECTING
 
-    private val _uiState = MutableStateFlow(MainUiState())
-    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+        MainUiState(
+            isScanning = scanning,
+            isConnecting = isConnecting,
+            isConnected = isConnected,
+            availableDevices = sortedDevices
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = MainUiState()
+    )
 
-    init {
-        observeScanningState()
-        observeConnectionState()
-        observeRssiUpdate()
-        observeDiscoveredDevices()
+
+    fun scanDevices() {
+        val config = BleScanConfig(minRssi = -80, scanDurationMs = 20000)
+        bleRepository.startScan(config)
     }
-
-    fun scanDevices() = bleRepository.startScan()
 
     fun stopScan() = bleRepository.stopScan()
-
-    private fun observeScanningState() {
-        viewModelScope.launch {
-            bleRepository.scanningInProgress.collect { it ->
-                val scanningInProgress = it
-                _uiState.update { it.copy(isScanning = scanningInProgress) }
-            }
-        }
-    }
-
-    private fun observeConnectionState() {
-        viewModelScope.launch {
-            bleRepository.connectionState.collect { it ->
-                if (it == BleConnectionState.CONNECTING) {
-                    _uiState.update { it.copy(isConnecting = true) }
-                    _uiState.update { it.copy(isConnected = false) }
-                }  else if (it == BleConnectionState.CONNECTED) {
-                    _uiState.update { it.copy(isConnecting = false) }
-                    _uiState.update { it.copy(isConnected = true) }
-                } else {
-                    _uiState.update { it.copy(isConnecting = false) }
-                    _uiState.update { it.copy(isConnected = false) }
-                }
-            }
-        }
-    }
-
-    private fun observeRssiUpdate() {
-
-    }
-
-    private fun observeDiscoveredDevices() {
-        viewModelScope.launch {
-            bleRepository.discoveredDevices.collect { devices ->
-                _uiState.update { it.copy(availableDevices = devices) }
-            }
-        }
-    }
 }

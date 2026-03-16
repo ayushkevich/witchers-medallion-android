@@ -26,4 +26,8 @@
     <!-- MAC Tracking -->
     <string name="mac_address">MAC Address</string>
     <string name="add_mac">Add MAC</string>
+
+    <!-- Devices search -->
+    <string name="device_name">Name</string>
+    <string name="signal_strength">Signal Strength</string>
 </resources>

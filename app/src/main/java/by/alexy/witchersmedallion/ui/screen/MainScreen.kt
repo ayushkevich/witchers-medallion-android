@@ -1,6 +1,8 @@
 package by.alexy.witchersmedallion.ui.screen
 
 import android.Manifest
+import android.R.attr.maxLines
+import android.R.attr.text
 import android.os.Build
 import android.widget.Spinner
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import by.alexy.witchersmedallion.R
 import by.alexy.witchersmedallion.ui.screen.component.ValueWithLabel
@@ -98,7 +101,26 @@ fun MainScreen(viewModel: MainViewModel) {
             }
         }
         if (uiState.availableDevices.isNotEmpty()) {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.device_name),
+                            Modifier.weight(1f),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        Text(
+                            stringResource(R.string.signal_strength),
+                            Modifier.weight(1f),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
                 items(
                     items = uiState.availableDevices,
                     key = { it.address }
@@ -106,10 +128,19 @@ fun MainScreen(viewModel: MainViewModel) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-//                            .clickable { viewModel.connectToDevice(device.address) }
                             .padding(4.dp)
                     ) {
-                        Text("${device.name ?: device.address} (${device.rssi} dBm)")
+                        Text(
+                            text = device.name ?: device.address,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "${device.rssi} dBm",
+                            modifier = Modifier.weight(1f),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.End
+                        )
                     }
                 }
             }

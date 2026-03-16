@@ -26,4 +26,9 @@
     <!-- MAC Tracking -->
     <string name="mac_address">MAC-адрес</string>
     <string name="add_mac">Добавить MAC-адрес</string>
+
+    <!-- Devices search -->
+    <string name="device_name">Имя устройства</string>
+    <string name="signal_strength">Сила сигнала</string>
+
 </resources>

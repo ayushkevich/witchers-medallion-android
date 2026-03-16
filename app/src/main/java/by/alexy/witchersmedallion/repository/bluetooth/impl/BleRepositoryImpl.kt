@@ -10,22 +10,30 @@ import android.content.Context
 import androidx.annotation.RequiresPermission
 import by.alexy.witchersmedallion.domain.BleConnectionState
 import by.alexy.witchersmedallion.domain.BleDevice
+import by.alexy.witchersmedallion.domain.BleScanConfig
 import by.alexy.witchersmedallion.repository.bluetooth.BleRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import java.util.TreeSet
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BleRepositoryImpl @Inject constructor (
+class BleRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : BleRepository {
-    private val _discoveredDevices = MutableStateFlow<List<BleDevice>>(emptyList())
-    override val discoveredDevices: Flow<List<BleDevice>> = _discoveredDevices.asStateFlow()
+    private val _discoveredDevices = MutableStateFlow<Map<String, BleDevice>>(emptyMap())
+    override val discoveredDevices: Flow<List<BleDevice>> = _discoveredDevices
+        .map { devices -> devices.values.toList() }
 
     private val _connectionState = MutableStateFlow(BleConnectionState.DISCONNECTED)
     override val connectionState: Flow<BleConnectionState> = _connectionState.asStateFlow()
@@ -35,6 +43,9 @@ class BleRepositoryImpl @Inject constructor (
 
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothLeScanner: BluetoothLeScanner? = null
+    private var currentScanConfig: BleScanConfig? = null
+    private var scanJob: Job? = null
+    private val scanScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     init {
         val btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -43,33 +54,56 @@ class BleRepositoryImpl @Inject constructor (
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
-    override fun startScan() {
-        _discoveredDevices.value = emptyList()
+    override fun startScan(config: BleScanConfig) {
+        currentScanConfig = config
+        _discoveredDevices.value = emptyMap()
         bluetoothLeScanner?.startScan(scanCallback)
         _scanningInProgress.update { true }
+
+        if (config.scanDurationMs > 0) {
+            scanJob = scanScope.launch {
+                delay(config.scanDurationMs)
+                stopScan()
+            }
+        }
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     override fun stopScan() {
         bluetoothLeScanner?.stopScan(scanCallback)
         _scanningInProgress.update { false }
+        currentScanConfig = null
     }
 
     private val scanCallback = object : ScanCallback() {
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val config = currentScanConfig ?: return
+
             val device = result.device
-            val bleDevice = BleDevice(
-                address = device.address,
-                name = device.name,
-                rssi = result.rssi
-            )
+            val address = device.address
+            val name = device.name.takeIf { it?.isNotBlank() == true }
+
+            if (result.rssi < config.minRssi) return
+
             _discoveredDevices.update { devices ->
-                val newDevices = devices.filter { it.address != bleDevice.address } + bleDevice
-                newDevices.sortedWith(
-                    compareByDescending<BleDevice> { it.rssi }
-                        .thenBy { it.name ?: "" }
-                )
+                val existingDevice = devices[address]
+
+                val updatedDevice = if (existingDevice != null) {
+                    if (name != null && name != existingDevice.name) {
+                        existingDevice.copy(name = name)
+                    } else {
+                        existingDevice
+                    }
+                } else {
+                    BleDevice(address = address, name = name, rssi = result.rssi)
+                }
+
+                if (updatedDevice == existingDevice) {
+                    devices
+                } else {
+                    devices + (address to updatedDevice)
+                }
             }
         }
     }
