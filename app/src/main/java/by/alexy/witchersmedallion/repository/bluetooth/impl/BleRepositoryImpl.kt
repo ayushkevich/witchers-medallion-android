@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val DEVICE_TIMEOUT_MS = 30_000L
 
 @Singleton
 class BleRepositoryImpl @Inject constructor(
@@ -45,12 +48,20 @@ class BleRepositoryImpl @Inject constructor(
     private var bluetoothLeScanner: BluetoothLeScanner? = null
     private var currentScanConfig: BleScanConfig? = null
     private var scanJob: Job? = null
-    private val scanScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var cleanupJob: Job? = null
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     init {
         val btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = btManager.adapter
         bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
+    }
+
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    fun clear() {
+        stopScan()
+        cleanupJob?.cancel()
+        repositoryScope.cancel()
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
@@ -60,10 +71,19 @@ class BleRepositoryImpl @Inject constructor(
         bluetoothLeScanner?.startScan(scanCallback)
         _scanningInProgress.update { true }
 
+        scanJob?.cancel()
         if (config.scanDurationMs > 0) {
-            scanJob = scanScope.launch {
+            scanJob = repositoryScope.launch {
                 delay(config.scanDurationMs)
                 stopScan()
+            }
+        }
+
+        cleanupJob?.cancel()
+        cleanupJob = repositoryScope.launch {
+            while (_scanningInProgress.value) {
+                delay(DEVICE_TIMEOUT_MS / 2)
+                cleanupStaleDevices()
             }
         }
     }
@@ -72,7 +92,18 @@ class BleRepositoryImpl @Inject constructor(
     override fun stopScan() {
         bluetoothLeScanner?.stopScan(scanCallback)
         _scanningInProgress.update { false }
+        scanJob?.cancel()
+        scanJob = null
+        cleanupJob?.cancel()
+        cleanupJob = null
         currentScanConfig = null
+    }
+
+    private fun cleanupStaleDevices() {
+        val now = System.currentTimeMillis()
+        _discoveredDevices.update { devices ->
+            devices.filterValues { it.timestamp + DEVICE_TIMEOUT_MS > now }
+        }
     }
 
     private val scanCallback = object : ScanCallback() {

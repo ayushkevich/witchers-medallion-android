@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import by.alexy.witchersmedallion.R
 import by.alexy.witchersmedallion.ui.model.MacDevice
 
+private const val MAX_TRACKED_MAC_DEVICES = 50
+
 @Composable
 fun MacTrackingScreen() {
     var macInput by remember { mutableStateOf("") }
@@ -37,15 +39,24 @@ fun MacTrackingScreen() {
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {
-                if (macInput.isNotBlank()) {
-                    trackedDevices.add(MacDevice(macInput, -60))
-                    macInput = ""
-                }
-            }) {
+            Button(
+                onClick = {
+                    if (macInput.isNotBlank() && trackedDevices.size < MAX_TRACKED_MAC_DEVICES) {
+                        trackedDevices.add(MacDevice(macInput.uppercase().trim(), -60))
+                        macInput = ""
+                    }
+                },
+                enabled = trackedDevices.size < MAX_TRACKED_MAC_DEVICES
+            ) {
                 Text(stringResource(R.string.add_mac))
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "${trackedDevices.size} / $MAX_TRACKED_MAC_DEVICES",
+            modifier = Modifier.padding(start = 8.dp)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
