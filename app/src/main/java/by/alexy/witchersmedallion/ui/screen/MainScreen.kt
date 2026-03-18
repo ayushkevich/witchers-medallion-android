@@ -1,10 +1,8 @@
 package by.alexy.witchersmedallion.ui.screen
 
 import android.Manifest
-import android.R.attr.maxLines
-import android.R.attr.text
 import android.os.Build
-import android.widget.Spinner
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import by.alexy.witchersmedallion.R
+import by.alexy.witchersmedallion.ui.screen.component.ConnectionConfirmationDialog
 import by.alexy.witchersmedallion.ui.screen.component.ValueWithLabel
 import by.alexy.witchersmedallion.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -36,6 +35,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val uiState by viewModel.uiState.collectAsState()
+    val dialogState by viewModel.dialogState.collectAsState()
 
     val permissionsState = rememberMultiplePermissionsState(
         permissions = blePermissions()
@@ -54,37 +54,37 @@ fun MainScreen(viewModel: MainViewModel) {
                 stringResource(R.string.disconnected)
             }
         )
-        ValueWithLabel(
-            label = stringResource(R.string.rssi),
-            value = if (uiState.isConnected) {
-                uiState.rssi.toString()
-            } else {
-                ""
-            }
-        )
+        if (uiState.isConnected && uiState.connectedDeviceName != null) {
+            Text(
+                text = stringResource(R.string.connected_device, uiState.connectedDeviceName!!),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Row {
-            if (uiState.isScanning) {
-                Button(onClick = {
-                    viewModel.stopScan()
-                }) {
-                    Text(stringResource(R.string.stop_scan))
-                }
-            } else {
-                Button(onClick = {
-                    if (permissionsState.allPermissionsGranted) {
-                        viewModel.scanDevices()
-                    } else {
-                        permissionsState.launchMultiplePermissionRequest()
+            if (!uiState.isConnected) {
+                if (uiState.isScanning) {
+                    Button(onClick = {
+                        viewModel.stopScan()
+                    }) {
+                        Text(stringResource(R.string.stop_scan))
                     }
-                }) {
-                    Text(stringResource(R.string.scan_devices))
+                } else {
+                    Button(onClick = {
+                        if (permissionsState.allPermissionsGranted) {
+                            viewModel.scanDevices()
+                        } else {
+                            permissionsState.launchMultiplePermissionRequest()
+                        }
+                    }) {
+                        Text(stringResource(R.string.scan_devices))
+                    }
                 }
+                Spacer(modifier = Modifier.width(8.dp))
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {}, enabled = uiState.isConnected) {
+            Button(onClick = { viewModel.disconnect() }, enabled = uiState.isConnected) {
                 Text(stringResource(R.string.disconnect))
             }
         }
@@ -129,6 +129,9 @@ fun MainScreen(viewModel: MainViewModel) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(4.dp)
+                            .clickable {
+                                viewModel.onDeviceClick(device)
+                            }
                     ) {
                         Text(
                             text = device.name ?: device.address,
@@ -147,8 +150,17 @@ fun MainScreen(viewModel: MainViewModel) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        if (dialogState.showDialog && dialogState.selectedDevice != null) {
+            ConnectionConfirmationDialog(
+                device = dialogState.selectedDevice!!,
+                onConfirm = { viewModel.onConfirmConnect() },
+                onDismiss = { viewModel.onCancelConnect() }
+            )
+        }
     }
 }
+
 
 private fun blePermissions(): List<String> {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

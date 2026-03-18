@@ -9,7 +9,7 @@
     <string name="connection_status">Connection Status:</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
-    <string name="rssi">RSSI:</string>
+    <string name="connected_device">Device is connected: %1$s</string>
     <string name="scan_devices">Scan Devices</string>
     <string name="stop_scan">Stop Scan</string>
     <string name="scan_in_progress">Looking for Devices…</string>
@@ -30,4 +30,10 @@
     <!-- Devices search -->
     <string name="device_name">Name</string>
     <string name="signal_strength">Signal Strength</string>
+
+    <!-- Dialogs -->
+    <string name="confirm_connection">Confirm Connection</string>
+    <string name="confirm_connection_message">Are you sure that you are going to connect %1$s?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

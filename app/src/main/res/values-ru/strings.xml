@@ -9,7 +9,7 @@
     <string name="connection_status">Статус соединения:</string>
     <string name="connected">Подключено</string>
     <string name="disconnected">Не подключено</string>
-    <string name="rssi">RSSI:</string>
+    <string name="connected_device">Подключено устройство: %1$s</string>
     <string name="scan_devices">Поиск устройств</string>
     <string name="stop_scan">Остановить сканирование</string>
     <string name="scan_in_progress">Поиск устройств…</string>
@@ -30,5 +30,10 @@
     <!-- Devices search -->
     <string name="device_name">Имя устройства</string>
     <string name="signal_strength">Сила сигнала</string>
-
+    
+    <!-- Dialogs -->
+    <string name="confirm_connection">Подтверждение подключения</string>
+    <string name="confirm_connection_message">Вы уверены, что хотите подключиться к устройству %1$s?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>
