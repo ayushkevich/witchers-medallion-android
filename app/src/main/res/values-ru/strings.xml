@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Witcher\'s Medallion</string>
+    <string name="app_name">Ведьмачий Медальон</string>
     <!-- Main Activity -->
     <string name="main_tab">Главная</string>
     <string name="calibration_tab">Калибровка RSSI</string>
@@ -20,12 +20,34 @@
     <string name="cold_warm">Холодно</string>
     <string name="warm_hot">Тепло</string>
     <string name="hot_found">Горячо</string>
-    <string name="auto_calibration">Авто калибюровка</string>
+    <string name="auto_calibration">Авто калибровка</string>
     <string name="save_to_esp32">Загрузить в Медальон</string>
+    <string name="current_rssi">Текущий сигнал: %1$d</string>
+    <string name="calibration_settings">Настройки калибровки</string>
+    <string name="set_defaults">Значения по умолчанию</string>
+    <string name="back_to_manual_calibration">Вернуться к ручной калибровке</string>
+    <string name="capture">Зафиксировать</string>
+    <string name="move_to_hot_zone">Перейдите в зону ГОРЯЧО и нажмите Зафиксировать</string>
+    <string name="move_to_warm_zone">Перейдите в зону ТЕПЛО и нажмите Зафиксировать</string>
+    <string name="move_to_cold_zone">Перейдите в зону ХОЛОДНО и нажмите Зафиксировать</string>
+    <string name="calibration_completed">Калибровка завершена!</string>
+    <string name="hot_zone_rssi">Сила сигнала для зоны ГОРЯЧО</string>
+    <string name="warm_zone_rssi">Сила сигнала для зоны ТЕПЛО</string>
+    <string name="cold_zone_rssi">Сила сигнала для зоны ХОЛОДНО</string>
 
     <!-- MAC Tracking -->
     <string name="mac_address">MAC-адрес</string>
     <string name="add_mac">Добавить MAC-адрес</string>
+    <string name="dynamic_mac">Д</string>
+    <string name="static_mac">С</string>
+    <string name="remove_mac">Удалить MAC</string>
+    <string name="mac_tracked_devices">Устройства</string>
+    <string name="mac_search">Поиск</string>
+    <string name="mac_stop_scan">Остановить сканирование</string>
+    <string name="mac_scan_devices">Сканировать</string>
+    <string name="mac_scan_in_progress">Сканирование…</string>
+    <string name="mac_add_mac_address">Добавить MAC</string>
+    <string name="mac_available_devices">Доступные устройства</string>
 
     <!-- Devices search -->
     <string name="device_name">Имя устройства</string>
@@ -36,4 +58,6 @@
     <string name="confirm_connection_message">Вы уверены, что хотите подключиться к устройству %1$s?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="error">Ошибка</string>
+    <string name="ok">OK</string>
 </resources>

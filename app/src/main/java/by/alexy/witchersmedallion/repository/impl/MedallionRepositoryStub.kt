@@ -10,7 +10,7 @@ class MedallionRepositoryStub @Inject constructor() : MedallionRepository {
 
     private val registeredMacAddresses = mutableListOf<String>()
 
-    private var currentRssi: Int? = null
+    private var currentRssi: Int? = -50
 
     private var calibrationSettings: MedallionCalibrationSettings? = null
 

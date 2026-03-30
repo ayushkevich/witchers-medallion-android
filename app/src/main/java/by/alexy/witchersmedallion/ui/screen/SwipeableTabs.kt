@@ -16,12 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import by.alexy.witchersmedallion.R
+import by.alexy.witchersmedallion.viewmodel.CalibrationViewModel
+import by.alexy.witchersmedallion.viewmodel.MacTrackingViewModel
 import by.alexy.witchersmedallion.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SwipeableTabs(viewModel: MainViewModel) {
+fun SwipeableTabs(
+    mainViewModel: MainViewModel,
+    calibrationViewModel : CalibrationViewModel,
+    macTrackingViewModel : MacTrackingViewModel
+) {
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
 
@@ -57,9 +64,9 @@ fun SwipeableTabs(viewModel: MainViewModel) {
             HorizontalPager(state = pagerState) { _ ->
                 Box(modifier = Modifier.fillMaxSize()) {
                     when (pagerState.currentPage) {
-                        0 -> MainScreen(viewModel)
-                        1 -> CalibrationScreen()
-                        2 -> MacTrackingScreen()
+                        0 -> MainScreen(mainViewModel)
+                        1 -> CalibrationScreen(calibrationViewModel)
+                        2 -> MacTrackingScreen(macTrackingViewModel)
                     }
                 }
             }

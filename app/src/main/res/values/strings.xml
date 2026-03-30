@@ -22,10 +22,32 @@
     <string name="hot_found">Hot</string>
     <string name="auto_calibration">Auto Calibration</string>
     <string name="save_to_esp32">Save to Medallion</string>
+    <string name="current_rssi">Current RSSI: %1$d</string>
+    <string name="calibration_settings">Calibration Settings</string>
+    <string name="set_defaults">Set Default Values</string>
+    <string name="back_to_manual_calibration">Back to manual calibration</string>
+    <string name="capture">Capture</string>
+    <string name="move_to_hot_zone">Move to HOT zone and press Capture</string>
+    <string name="move_to_warm_zone">Move to WARM zone and press Capture</string>
+    <string name="move_to_cold_zone">Move to COLD zone and press Capture</string>
+    <string name="calibration_completed">Calibration completed!</string>
+    <string name="hot_zone_rssi">HOT Zone RSSI</string>
+    <string name="warm_zone_rssi">WARM Zone RSSI</string>
+    <string name="cold_zone_rssi">COLD Zone RSSI</string>
 
     <!-- MAC Tracking -->
     <string name="mac_address">MAC Address</string>
     <string name="add_mac">Add MAC</string>
+    <string name="dynamic_mac">D</string>
+    <string name="static_mac">D</string>
+    <string name="remove_mac">Remove MAC</string>
+    <string name="mac_tracked_devices">Tracked Devices</string>
+    <string name="mac_search">Search</string>
+    <string name="mac_stop_scan">Stop Scan</string>
+    <string name="mac_scan_devices">Scan Devices</string>
+    <string name="mac_scan_in_progress">Scanning…</string>
+    <string name="mac_add_mac_address">Add MAC</string>
+    <string name="mac_available_devices">Available Devices</string>
 
     <!-- Devices search -->
     <string name="device_name">Name</string>
@@ -36,4 +58,6 @@
     <string name="confirm_connection_message">Are you sure that you are going to connect %1$s?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="error">Error</string>
+    <string name="ok">OK</string>
 </resources>
