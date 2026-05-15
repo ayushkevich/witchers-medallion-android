@@ -27,26 +27,26 @@ import by.alexy.witchersmedallion.ui.model.MacDevice
 fun MacDeviceCardComponent(
     device: MacDevice,
     isDynamic: Boolean,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {  },
+            .clickable { },
         colors = CardDefaults.cardColors(
             containerColor = if (isDynamic) {
                 MaterialTheme.colorScheme.surfaceVariant
             } else {
                 MaterialTheme.colorScheme.surface
-            }
-        )
+            },
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -54,20 +54,20 @@ fun MacDeviceCardComponent(
                         text = device.mac,
                         style = MaterialTheme.typography.bodyLarge,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     if (isDynamic) {
                         Text(
                             text = stringResource(R.string.dynamic_mac),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     } else {
                         Text(
                             text = stringResource(R.string.static_mac),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.secondary,
                         )
                     }
                 }
@@ -75,7 +75,7 @@ fun MacDeviceCardComponent(
                 Text(
                     text = "${stringResource(R.string.signal_strength)}: ${device.rssi} dBm",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Button(

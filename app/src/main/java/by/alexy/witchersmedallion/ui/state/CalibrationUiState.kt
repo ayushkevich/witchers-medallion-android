@@ -13,7 +13,7 @@ data class CalibrationUiState(
     val isAutoCalibrationMode: Boolean = false,
     val autoCalibrationStep: AutoCalibrationStep = AutoCalibrationStep.NONE,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )
 
 enum class AutoCalibrationStep {
@@ -21,5 +21,5 @@ enum class AutoCalibrationStep {
     MOVE_TO_HOT,
     MOVE_TO_WARM,
     MOVE_TO_COLD,
-    COMPLETED
+    COMPLETED,
 }

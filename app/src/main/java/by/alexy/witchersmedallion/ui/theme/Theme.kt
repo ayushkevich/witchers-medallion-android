@@ -12,16 +12,16 @@ private val BootstrapColorScheme = darkColorScheme(
     onPrimary = BootstrapLight,
     onSecondary = BootstrapLight,
     onBackground = BootstrapLight,
-    onSurface = BootstrapLight
+    onSurface = BootstrapLight,
 )
 
 @Composable
 fun WitchersMedallionTheme(
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colorScheme = BootstrapColorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

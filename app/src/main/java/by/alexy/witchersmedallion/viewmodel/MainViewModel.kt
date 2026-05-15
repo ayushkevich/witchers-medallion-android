@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val bleRepository: BleRepository
+    private val bleRepository: BleRepository,
 ) : ViewModel() {
 
     private val dialogStateFlow = MutableStateFlow(DialogState())
@@ -33,27 +33,22 @@ class MainViewModel @Inject constructor(
         bleRepository.discoveredDevices.map { devices ->
             devices.sortedWith(
                 compareByDescending<BleDevice> { it.rssi }
-                    .thenBy { it.name ?: "" }
+                    .thenBy { it.name ?: "" },
             )
         },
-        bleRepository.connectedDeviceName
+        bleRepository.connectedDeviceName,
     ) { scanning, connectionState, sortedDevices, deviceName ->
-        val isConnected = connectionState == BleConnectionState.CONNECTED
-        val isConnecting = connectionState == BleConnectionState.CONNECTING
-
         MainUiState(
+            state = connectionState,
             isScanning = scanning,
-            isConnecting = isConnecting,
-            isConnected = isConnected,
-            availableDevices = if (isConnected) emptyList() else sortedDevices,
-            connectedDeviceName = deviceName
+            availableDevices = if (connectionState == BleConnectionState.CONNECTED) emptyList() else sortedDevices,
+            connectedDeviceName = deviceName,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(3000),
-        initialValue = MainUiState()
+        initialValue = MainUiState(),
     )
-
 
     fun scanDevices() {
         val config = BleScanConfig(minRssi = -80, scanDurationMs = 20000)
@@ -70,7 +65,7 @@ class MainViewModel @Inject constructor(
         dialogStateFlow.update {
             it.copy(
                 showDialog = true,
-                selectedDevice = device
+                selectedDevice = device,
             )
         }
     }

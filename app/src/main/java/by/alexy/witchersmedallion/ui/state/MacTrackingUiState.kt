@@ -9,5 +9,5 @@ data class MacTrackingUiState(
     val searchQuery: String = "",
     val isScanning: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

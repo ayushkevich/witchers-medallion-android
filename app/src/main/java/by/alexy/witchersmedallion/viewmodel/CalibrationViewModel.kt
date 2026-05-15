@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CalibrationViewModel @Inject constructor(
-    private val medallionRepository: MedallionRepository
+    private val medallionRepository: MedallionRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalibrationUiState())
@@ -40,14 +40,14 @@ class CalibrationViewModel @Inject constructor(
                         coldRssi = settings?.coldRssi ?: state.coldRssi,
                         warmRssi = settings?.warmRssi ?: state.warmRssi,
                         hotRssi = settings?.hotRssi ?: state.hotRssi,
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message
+                        errorMessage = e.message,
                     )
                 }
             }
@@ -84,7 +84,7 @@ class CalibrationViewModel @Inject constructor(
             it.copy(
                 coldRssi = -70,
                 warmRssi = -60,
-                hotRssi = -45
+                hotRssi = -45,
             )
         }
     }
@@ -96,21 +96,21 @@ class CalibrationViewModel @Inject constructor(
                 val settings = MedallionCalibrationSettings(
                     coldRssi = _uiState.value.coldRssi,
                     warmRssi = _uiState.value.warmRssi,
-                    hotRssi = _uiState.value.hotRssi
+                    hotRssi = _uiState.value.hotRssi,
                 )
                 medallionRepository.setCalibrationSettings(settings)
                 _uiState.update {
                     it.copy(
                         calibrationSettings = settings,
                         isLoading = false,
-                        errorMessage = null
+                        errorMessage = null,
                     )
                 }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message
+                        errorMessage = e.message,
                     )
                 }
             }
@@ -121,7 +121,7 @@ class CalibrationViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isAutoCalibrationMode = true,
-                autoCalibrationStep = AutoCalibrationStep.MOVE_TO_HOT
+                autoCalibrationStep = AutoCalibrationStep.MOVE_TO_HOT,
             )
         }
     }
@@ -130,7 +130,7 @@ class CalibrationViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isAutoCalibrationMode = false,
-                autoCalibrationStep = AutoCalibrationStep.NONE
+                autoCalibrationStep = AutoCalibrationStep.NONE,
             )
         }
     }
@@ -160,7 +160,7 @@ class CalibrationViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         autoCalibrationStep = nextStep,
-                        currentRssi = currentRssi
+                        currentRssi = currentRssi,
                     )
                 }
 
@@ -168,7 +168,7 @@ class CalibrationViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isAutoCalibrationMode = false,
-                            autoCalibrationStep = AutoCalibrationStep.NONE
+                            autoCalibrationStep = AutoCalibrationStep.NONE,
                         )
                     }
                 }

@@ -12,7 +12,7 @@ import by.alexy.witchersmedallion.domain.BleDevice
 fun ConnectionConfirmationDialog(
     device: BleDevice,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -23,8 +23,8 @@ fun ConnectionConfirmationDialog(
             Text(
                 stringResource(
                     R.string.confirm_connection_message,
-                    device.name ?: device.address
-                )
+                    device.name ?: device.address,
+                ),
             )
         },
         confirmButton = {
@@ -36,6 +36,6 @@ fun ConnectionConfirmationDialog(
             Button(onClick = onDismiss) {
                 Text(stringResource(R.string.no))
             }
-        }
+        },
     )
 }

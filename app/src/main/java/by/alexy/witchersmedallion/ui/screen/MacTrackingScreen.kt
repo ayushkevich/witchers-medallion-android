@@ -46,18 +46,18 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         ValueWithLabel(
             label = stringResource(R.string.mac_tracked_devices),
-            value = "${uiState.trackedDevices.size}"
+            value = "${uiState.trackedDevices.size}",
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             TextField(
                 value = uiState.searchQuery,
@@ -67,8 +67,8 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
-                )
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                ),
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -76,14 +76,14 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
             if (uiState.isScanning) {
                 Button(
                     onClick = { viewModel.stopScan() },
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading,
                 ) {
                     Text(stringResource(R.string.mac_stop_scan))
                 }
             } else {
                 Button(
                     onClick = { viewModel.startScan() },
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading,
                 ) {
                     Text(stringResource(R.string.mac_scan_devices))
                 }
@@ -95,16 +95,16 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
         if (uiState.isScanning && uiState.trackedDevices.isEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
+                    strokeWidth = 2.dp,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.scan_in_progress),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
         }
@@ -112,14 +112,14 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Text(
                     text = stringResource(R.string.mac_add_mac_address),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -131,7 +131,7 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
                         label = { Text(stringResource(R.string.mac_address)) },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-                        singleLine = true
+                        singleLine = true,
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -143,7 +143,7 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
                                 viewModel.onSearchQueryChange("")
                             }
                         },
-                        enabled = uiState.searchQuery.isNotBlank() && !uiState.isLoading
+                        enabled = uiState.searchQuery.isNotBlank() && !uiState.isLoading,
                     ) {
                         Text(stringResource(R.string.add_mac))
                     }
@@ -164,7 +164,7 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
                     }) {
                         Text(stringResource(R.string.ok))
                     }
-                }
+                },
             )
         }
 
@@ -173,21 +173,21 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
         Text(
             text = stringResource(R.string.mac_available_devices),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(
                 items = uiState.trackedDevices,
-                key = { it.mac }
+                key = { it.mac },
             ) { device ->
                 MacDeviceCardComponent(
                     device = device,
                     isDynamic = viewModel.isDynamicMac(device.mac),
-                    onRemove = { viewModel.removeMacAddress(device.mac) }
+                    onRemove = { viewModel.removeMacAddress(device.mac) },
                 )
             }
         }
@@ -196,7 +196,7 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
             ConnectionConfirmationDialog(
                 device = dialogState.selectedDevice!!,
                 onConfirm = { viewModel.onConfirmAddDevice() },
-                onDismiss = { viewModel.onCancelAddDevice() }
+                onDismiss = { viewModel.onCancelAddDevice() },
             )
         }
     }

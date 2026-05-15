@@ -34,20 +34,20 @@ fun CalibrationScreen(viewModel: CalibrationViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(R.string.current_rssi, uiState.currentRssi ?: 0),
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
         }
@@ -55,14 +55,14 @@ fun CalibrationScreen(viewModel: CalibrationViewModel) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Text(
                     text = stringResource(R.string.calibration_settings),
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
 
                 if (uiState.isAutoCalibrationMode) {
@@ -72,7 +72,7 @@ fun CalibrationScreen(viewModel: CalibrationViewModel) {
                         hotRssi = uiState.hotRssi,
                         warmRssi = uiState.warmRssi,
                         coldRssi = uiState.coldRssi,
-                        onCapture = { viewModel.captureRssiForCurrentStep() }
+                        onCapture = { viewModel.captureRssiForCurrentStep() },
                     )
                 } else {
                     ManualCalibrationComponent(
@@ -81,60 +81,60 @@ fun CalibrationScreen(viewModel: CalibrationViewModel) {
                         hotRssi = uiState.hotRssi,
                         onColdRssiChange = { viewModel.updateColdRssi(it) },
                         onWarmRssiChange = { viewModel.updateWarmRssi(it) },
-                        onHotRssiChange = { viewModel.updateHotRssi(it) }
+                        onHotRssiChange = { viewModel.updateHotRssi(it) },
                     )
                 }
             }
         }
 
-            if (!uiState.isAutoCalibrationMode) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(onClick = { viewModel.startAutoCalibration() }) {
-                        Text(stringResource(R.string.auto_calibration))
-                    }
-
-                    Button(
-                        onClick = { viewModel.setDefaultValues() },
-                        enabled = !uiState.isLoading
-                    ) {
-                        Text(stringResource(R.string.set_defaults))
-                    }
+        if (!uiState.isAutoCalibrationMode) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Button(onClick = { viewModel.startAutoCalibration() }) {
+                    Text(stringResource(R.string.auto_calibration))
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = { viewModel.setDefaultValues() },
+                    enabled = !uiState.isLoading,
+                ) {
+                    Text(stringResource(R.string.set_defaults))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { viewModel.saveCalibrationSettings() },
+                enabled = !uiState.isLoading,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.save_to_esp32))
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Button(
+                    onClick = { viewModel.cancelAutoCalibration() },
+                ) {
+                    Text(stringResource(R.string.back_to_manual_calibration))
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Button(
                     onClick = { viewModel.saveCalibrationSettings() },
-                    enabled = !uiState.isLoading,
-                    modifier = Modifier.fillMaxWidth()
+                    enabled = !uiState.isLoading && uiState.autoCalibrationStep == AutoCalibrationStep.COMPLETED,
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(stringResource(R.string.save_to_esp32))
                 }
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = { viewModel.cancelAutoCalibration() }
-                    ) {
-                        Text(stringResource(R.string.back_to_manual_calibration))
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        onClick = { viewModel.saveCalibrationSettings() },
-                        enabled = !uiState.isLoading && uiState.autoCalibrationStep == AutoCalibrationStep.COMPLETED,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.save_to_esp32))
-                    }
-                }
             }
+        }
 
         uiState.errorMessage?.let { error ->
             Spacer(modifier = Modifier.height(16.dp))
@@ -146,14 +146,14 @@ fun CalibrationScreen(viewModel: CalibrationViewModel) {
                     TextButton(onClick = { viewModel.clearError() }) {
                         Text("OK")
                     }
-                }
+                },
             )
         }
 
         if (uiState.isLoading) {
             Spacer(modifier = Modifier.height(16.dp))
             CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }
     }

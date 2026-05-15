@@ -24,7 +24,7 @@ fun AutoCalibrationComponent(
     hotRssi: Int,
     warmRssi: Int,
     coldRssi: Int,
-    onCapture: () -> Unit
+    onCapture: () -> Unit,
 ) {
     val instructionText = when (currentStep) {
         AutoCalibrationStep.MOVE_TO_HOT -> stringResource(R.string.move_to_hot_zone)
@@ -36,13 +36,13 @@ fun AutoCalibrationComponent(
 
     Text(
         text = instructionText,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(bottom = 16.dp),
     )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp)
+            .padding(bottom = 16.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -78,12 +78,12 @@ fun AutoCalibrationComponent(
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row {
             Button(
                 onClick = { onCapture() },
-                enabled = currentStep != AutoCalibrationStep.COMPLETED
+                enabled = currentStep != AutoCalibrationStep.COMPLETED,
             ) {
                 Text(stringResource(R.string.capture))
             }

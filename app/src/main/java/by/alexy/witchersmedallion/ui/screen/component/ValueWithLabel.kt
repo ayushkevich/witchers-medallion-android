@@ -14,12 +14,12 @@ fun ValueWithLabel(label: String, value: String) {
     Row {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }

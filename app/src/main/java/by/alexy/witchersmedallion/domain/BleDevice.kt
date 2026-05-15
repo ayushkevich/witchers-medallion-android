@@ -4,5 +4,5 @@ data class BleDevice(
     val address: String,
     val name: String?,
     val rssi: Int,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
 )

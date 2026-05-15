@@ -16,12 +16,12 @@ fun ManualCalibrationComponent(
     hotRssi: Int,
     onColdRssiChange: (Int) -> Unit,
     onWarmRssiChange: (Int) -> Unit,
-    onHotRssiChange: (Int) -> Unit
+    onHotRssiChange: (Int) -> Unit,
 ) {
     SliderWithLabelInt(
         label = stringResource(R.string.cold_warm),
         value = coldRssi,
-        onValueChange = { onColdRssiChange(it) }
+        onValueChange = { onColdRssiChange(it) },
     )
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -29,7 +29,7 @@ fun ManualCalibrationComponent(
     SliderWithLabelInt(
         label = stringResource(R.string.warm_hot),
         value = warmRssi,
-        onValueChange = { onWarmRssiChange(it) }
+        onValueChange = { onWarmRssiChange(it) },
     )
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -37,6 +37,6 @@ fun ManualCalibrationComponent(
     SliderWithLabelInt(
         label = stringResource(R.string.hot_found),
         value = hotRssi,
-        onValueChange = { onHotRssiChange(it) }
+        onValueChange = { onHotRssiChange(it) },
     )
 }

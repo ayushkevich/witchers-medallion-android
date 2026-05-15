@@ -13,7 +13,7 @@ fun SliderWithLabelInt(label: String, value: Int, onValueChange: (Int) -> Unit) 
             value = value.toFloat(),
             onValueChange = { onValueChange(it.toInt()) },
             valueRange = -100f..0f,
-            steps = 100
+            steps = 100,
         )
     }
 }

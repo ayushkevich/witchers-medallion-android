@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import by.alexy.witchersmedallion.R
 import by.alexy.witchersmedallion.viewmodel.CalibrationViewModel
 import by.alexy.witchersmedallion.viewmodel.MacTrackingViewModel
@@ -26,8 +25,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SwipeableTabs(
     mainViewModel: MainViewModel,
-    calibrationViewModel : CalibrationViewModel,
-    macTrackingViewModel : MacTrackingViewModel
+    calibrationViewModel: CalibrationViewModel,
+    macTrackingViewModel: MacTrackingViewModel,
 ) {
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
@@ -35,17 +34,17 @@ fun SwipeableTabs(
     val tabs = listOf(
         stringResource(R.string.main_tab),
         stringResource(R.string.calibration_tab),
-        stringResource(R.string.mac_settings_tab)
+        stringResource(R.string.mac_settings_tab),
     )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets.systemBars
+        contentWindowInsets = WindowInsets.systemBars,
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             TabRow(selectedTabIndex = pagerState.currentPage) {
                 tabs.forEachIndexed { index, title ->
@@ -56,7 +55,7 @@ fun SwipeableTabs(
                                 pagerState.animateScrollToPage(index)
                             }
                         },
-                        text = { Text(title) }
+                        text = { Text(title) },
                     )
                 }
             }

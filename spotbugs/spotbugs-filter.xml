@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Ignore generated Hilt code -->
+    <Match>
+        <Class name="~.*\.Hilt_.*"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.dagger.*\.Hilt_*"/>
+    </Match>
+    <Match>
+        <Class name="~.*\._*Factory"/>
+    </Match>
+    <!-- Ignore synthetic methods -->
+    <Match>
+        <Bug pattern="SBSC_USE_STRINGBYTECONSTRUCTOR"/>
+    </Match>
+</FindBugsFilter>

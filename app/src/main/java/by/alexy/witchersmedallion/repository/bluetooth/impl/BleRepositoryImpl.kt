@@ -42,7 +42,7 @@ private const val CLEANUP_INTERVAL_MS = 15_000L
 
 @Singleton
 class BleRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : BleRepository {
     private val _discoveredDevices = MutableStateFlow<Map<String, BleDevice>>(emptyMap())
     override val discoveredDevices: Flow<List<BleDevice>> = _discoveredDevices
@@ -79,9 +79,12 @@ class BleRepositoryImpl @Inject constructor(
         bluetoothLeScanner = bluetoothAdapter?.takeIf { it.isEnabled }?.bluetoothLeScanner
     }
 
-    @RequiresPermission(allOf = [
-        Manifest.permission.BLUETOOTH_SCAN,
-        Manifest.permission.BLUETOOTH_CONNECT])
+    @RequiresPermission(
+        allOf = [
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+        ],
+    )
     override fun clear() {
         stopScan()
         disconnectInternal()
@@ -160,7 +163,7 @@ class BleRepositoryImpl @Inject constructor(
                     val gatt = bleDevice.connectGatt(
                         context,
                         false,
-                        connectCallback
+                        connectCallback,
                     )
 
                     if (gatt == null) {

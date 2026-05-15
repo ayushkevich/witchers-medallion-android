@@ -1,6 +1,5 @@
 package by.alexy.witchersmedallion.repository.bluetooth
 
-import androidx.annotation.RequiresPermission
 import by.alexy.witchersmedallion.domain.BleConnectionState
 import by.alexy.witchersmedallion.domain.BleDevice
 import by.alexy.witchersmedallion.domain.BleScanConfig
