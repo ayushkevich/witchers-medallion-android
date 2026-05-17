@@ -140,11 +140,11 @@ fun CalibrationScreen(viewModel: CalibrationViewModel) {
             Spacer(modifier = Modifier.height(16.dp))
             AlertDialog(
                 onDismissRequest = { viewModel.clearError() },
-                title = { Text("Error") },
+                title = { Text(stringResource(R.string.error)) },
                 text = { Text(error) },
                 confirmButton = {
                     TextButton(onClick = { viewModel.clearError() }) {
-                        Text("OK")
+                        Text(stringResource(R.string.ok))
                     }
                 },
             )

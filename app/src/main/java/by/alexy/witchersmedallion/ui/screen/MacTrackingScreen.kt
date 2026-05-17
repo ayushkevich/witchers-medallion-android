@@ -25,12 +25,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import by.alexy.witchersmedallion.R
+import by.alexy.witchersmedallion.domain.BleDevice
 import by.alexy.witchersmedallion.ui.screen.component.ConnectionConfirmationDialog
 import by.alexy.witchersmedallion.ui.screen.component.ValueWithLabel
 import by.alexy.witchersmedallion.ui.screen.component.mac.MacDeviceCardComponent
@@ -41,7 +45,9 @@ private const val MAX_TRACKED_MAC_DEVICES = 50
 @Composable
 fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val dialogState by viewModel.dialogState.collectAsState()
+
+    var showAddDialog by remember { mutableStateOf(false) }
+    var selectedDeviceForAdd by remember { mutableStateOf<BleDevice?>(null) }
 
     Column(
         modifier = Modifier
@@ -60,9 +66,9 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             TextField(
-                value = uiState.searchQuery,
-                onValueChange = { viewModel.onSearchQueryChange(it) },
-                label = { Text(stringResource(R.string.mac_search)) },
+                value = uiState.macInput,
+                onValueChange = { viewModel.onMacInputChange(it) },
+                label = { Text(stringResource(R.string.mac_address)) },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
@@ -126,8 +132,8 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
 
                 Row {
                     TextField(
-                        value = uiState.searchQuery,
-                        onValueChange = { /* handled above */ },
+                        value = uiState.macInput,
+                        onValueChange = { viewModel.onMacInputChange(it) },
                         label = { Text(stringResource(R.string.mac_address)) },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
@@ -138,12 +144,12 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
 
                     Button(
                         onClick = {
-                            if (uiState.searchQuery.isNotBlank()) {
-                                viewModel.addMacAddress(uiState.searchQuery)
-                                viewModel.onSearchQueryChange("")
+                            if (uiState.macInput.isNotBlank()) {
+                                viewModel.addMacAddress(uiState.macInput)
+                                viewModel.onMacInputChange("")
                             }
                         },
-                        enabled = uiState.searchQuery.isNotBlank() && !uiState.isLoading,
+                        enabled = uiState.macInput.isNotBlank() && !uiState.isLoading,
                     ) {
                         Text(stringResource(R.string.add_mac))
                     }
@@ -155,13 +161,11 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
 
         if (uiState.errorMessage != null) {
             AlertDialog(
-                onDismissRequest = { /* No dismiss, user needs to see error */ },
+                onDismissRequest = { viewModel.clearError() },
                 title = { Text(stringResource(R.string.error)) },
-                text = { Text(uiState.errorMessage!!) },
+                text = { Text(uiState.errorMessage!!.getString(androidx.compose.ui.platform.LocalContext.current)) },
                 confirmButton = {
-                    TextButton(onClick = {
-                        viewModel.onSearchQueryChange("")
-                    }) {
+                    TextButton(onClick = { viewModel.clearError() }) {
                         Text(stringResource(R.string.ok))
                     }
                 },
@@ -192,11 +196,18 @@ fun MacTrackingScreen(viewModel: MacTrackingViewModel) {
             }
         }
 
-        if (dialogState.showDialog && dialogState.selectedDevice != null) {
+        if (showAddDialog && selectedDeviceForAdd != null) {
             ConnectionConfirmationDialog(
-                device = dialogState.selectedDevice!!,
-                onConfirm = { viewModel.onConfirmAddDevice() },
-                onDismiss = { viewModel.onCancelAddDevice() },
+                device = selectedDeviceForAdd!!,
+                onConfirm = {
+                    viewModel.confirmAddDevice(selectedDeviceForAdd!!)
+                    showAddDialog = false
+                    selectedDeviceForAdd = null
+                },
+                onDismiss = {
+                    showAddDialog = false
+                    selectedDeviceForAdd = null
+                },
             )
         }
     }

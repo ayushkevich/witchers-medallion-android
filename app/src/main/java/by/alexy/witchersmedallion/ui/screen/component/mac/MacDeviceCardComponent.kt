@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import by.alexy.witchersmedallion.R
 import by.alexy.witchersmedallion.ui.model.MacDevice
+import by.alexy.witchersmedallion.util.RssiColorUtils
 
 @Composable
 fun MacDeviceCardComponent(
@@ -73,9 +74,9 @@ fun MacDeviceCardComponent(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${stringResource(R.string.signal_strength)}: ${device.rssi} dBm",
+                    text = stringResource(R.string.signal_strength_with_rssi, device.rssi),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = RssiColorUtils.getRssiColor(device.rssi, MaterialTheme.colorScheme),
                 )
             }
             Button(

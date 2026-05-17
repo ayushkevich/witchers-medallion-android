@@ -10,12 +10,17 @@ import android.bluetooth.BluetoothProfile.STATE_CONNECTED
 import android.bluetooth.BluetoothProfile.STATE_DISCONNECTED
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.os.ParcelUuid
 import androidx.annotation.RequiresPermission
+import by.alexy.witchersmedallion.config.BleConfig
 import by.alexy.witchersmedallion.domain.BleConnectionState
 import by.alexy.witchersmedallion.domain.BleDevice
 import by.alexy.witchersmedallion.domain.BleScanConfig
+import by.alexy.witchersmedallion.domain.BleScanError
 import by.alexy.witchersmedallion.repository.bluetooth.BleRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -32,11 +37,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val DEVICE_TIMEOUT_MS = 30_000L
-private const val DELAY_BEFORE_CONNECT_MS = 500L
+private const val DEVICE_TIMEOUT_SECONDS = 30L
 private const val CONNECT_TIMEOUT_MS = 30_000L
 private const val CLEANUP_INTERVAL_MS = 15_000L
 
@@ -57,9 +63,13 @@ class BleRepositoryImpl @Inject constructor(
     private val _connectedDeviceName = MutableStateFlow<String?>(null)
     override val connectedDeviceName: Flow<String?> = _connectedDeviceName.asStateFlow()
 
+    private val _scanError = MutableStateFlow<BleScanError?>(null)
+    override val scanError: Flow<BleScanError?> = _scanError.asStateFlow()
+
     private val bluetoothAdapter: BluetoothAdapter?
     private val bluetoothLeScanner: BluetoothLeScanner?
 
+    private var activeScanClients: Int = 0
     private var currentScanConfig: BleScanConfig? = null
     private var connectedDevice: BluetoothDevice? = null
     private var bluetoothGatt: BluetoothGatt? = null
@@ -90,51 +100,76 @@ class BleRepositoryImpl @Inject constructor(
         disconnectInternal()
         cleanupJob?.cancel()
         connectionTimeoutJob?.cancel()
+        _scanError.value = null
         repositoryScope.cancel()
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     override fun startScan(config: BleScanConfig) {
-        if (bluetoothLeScanner == null) return
-
-        currentScanConfig = config
-        _discoveredDevices.value = emptyMap()
-        bluetoothLeScanner.startScan(scanCallback)
-        _scanningInProgress.update { true }
-
-        scanJob?.cancel()
-        if (config.scanDurationMs > 0) {
-            scanJob = repositoryScope.launch {
-                delay(config.scanDurationMs)
-                stopScan()
-            }
+        if (bluetoothLeScanner == null) {
+            _scanError.value = BleScanError.ScannerUnavailable
+            return
         }
 
-        cleanupJob?.cancel()
-        cleanupJob = repositoryScope.launch {
-            while (_scanningInProgress.value) {
-                delay(CLEANUP_INTERVAL_MS)
-                cleanupStaleDevices()
+        activeScanClients++
+        currentScanConfig = config
+        _scanError.value = null
+
+        val isFirstClient = activeScanClients == 1
+
+        if (isFirstClient) {
+            _scanningInProgress.update { true }
+
+            val scanFilters = listOf(
+                ScanFilter.Builder()
+                    .setServiceUuid(ParcelUuid(BleConfig.SERVICE_UUID))
+                    .build(),
+            )
+
+            val settings = ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build()
+
+            bluetoothLeScanner?.startScan(scanFilters, settings, scanCallback)
+
+            cleanupJob?.cancel()
+            cleanupJob = repositoryScope.launch {
+                while (activeScanClients > 0 && _scanningInProgress.value) {
+                    delay(CLEANUP_INTERVAL_MS)
+                    cleanupStaleDevices()
+                }
+            }
+
+            if (config.scanDurationMs > 0) {
+                scanJob = repositoryScope.launch {
+                    delay(config.scanDurationMs)
+                    stopScan()
+                }
             }
         }
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     override fun stopScan() {
-        if (!_scanningInProgress.value) return
+        if (activeScanClients <= 0) return
 
-        bluetoothLeScanner?.stopScan(scanCallback)
-        _scanningInProgress.update { false }
-        scanJob?.cancel()
-        scanJob = null
-        cleanupJob?.cancel()
-        cleanupJob = null
-        currentScanConfig = null
+        activeScanClients--
+
+        if (activeScanClients <= 0) {
+            bluetoothLeScanner?.stopScan(scanCallback)
+            _scanningInProgress.update { false }
+            scanJob?.cancel()
+            scanJob = null
+            cleanupJob?.cancel()
+            cleanupJob = null
+            currentScanConfig = null
+            activeScanClients = 0
+        }
+        _scanError.value = null
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun connectToDevice(device: BleDevice) {
-        _discoveredDevices.value = emptyMap()
         if (bluetoothAdapter == null || bluetoothAdapter?.isEnabled == false) {
             _connectionState.update { BleConnectionState.DISCONNECTED }
             return
@@ -158,8 +193,6 @@ class BleRepositoryImpl @Inject constructor(
         connectionJob = repositoryScope.launch {
             connectionMutex.withLock {
                 try {
-                    delay(DELAY_BEFORE_CONNECT_MS)
-
                     val gatt = bleDevice.connectGatt(
                         context,
                         false,
@@ -194,10 +227,10 @@ class BleRepositoryImpl @Inject constructor(
     }
 
     private fun cleanupStaleDevices() {
-        val now = System.currentTimeMillis()
+        val cutoff = Instant.now().minus(DEVICE_TIMEOUT_SECONDS, ChronoUnit.SECONDS)
         _discoveredDevices.update { devices ->
             if (devices.isEmpty()) return@update emptyMap()
-            devices.filterValues { it.timestamp + DEVICE_TIMEOUT_MS > now }
+            devices.filterValues { it.lastSeenAt.isAfter(cutoff) }
         }
     }
 
@@ -245,7 +278,7 @@ class BleRepositoryImpl @Inject constructor(
                                 existingDevice
                             }
                         } else {
-                            BleDevice(address = address, name = name, rssi = result.rssi)
+                            BleDevice(address = address, name = name, rssi = result.rssi, lastSeenAt = Instant.now())
                         }
 
                         if (updatedDevice == existingDevice) {

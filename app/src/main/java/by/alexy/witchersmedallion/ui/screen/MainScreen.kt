@@ -18,15 +18,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import by.alexy.witchersmedallion.R
 import by.alexy.witchersmedallion.domain.BleConnectionState
+import by.alexy.witchersmedallion.domain.BleDevice
 import by.alexy.witchersmedallion.permissions.getBlePermissions
 import by.alexy.witchersmedallion.ui.screen.component.ConnectionConfirmationDialog
 import by.alexy.witchersmedallion.ui.screen.component.ValueWithLabel
+import by.alexy.witchersmedallion.util.RssiColorUtils
 import by.alexy.witchersmedallion.viewmodel.MainViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -35,8 +41,11 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val dialogState by viewModel.dialogState.collectAsState()
     val isConnected = uiState.state == BleConnectionState.CONNECTED
+    val view = LocalView.current
+
+    var showConnectDialog by remember { mutableStateOf(false) }
+    var selectedDeviceForConnect by remember { mutableStateOf<BleDevice?>(null) }
 
     val permissionsState = rememberMultiplePermissionsState(
         permissions = getBlePermissions(),
@@ -127,7 +136,11 @@ fun MainScreen(viewModel: MainViewModel) {
                             .fillMaxWidth()
                             .padding(4.dp)
                             .clickable {
-                                viewModel.onDeviceClick(device)
+                                if (!view.isInEditMode) {
+                                    view.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
+                                }
+                                selectedDeviceForConnect = device
+                                showConnectDialog = true
                             },
                     ) {
                         Text(
@@ -137,9 +150,10 @@ fun MainScreen(viewModel: MainViewModel) {
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = "${device.rssi} dBm",
+                            text = stringResource(R.string.rssi_unit, device.rssi),
                             modifier = Modifier.weight(1f),
                             textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                            color = RssiColorUtils.getRssiColor(device.rssi, MaterialTheme.colorScheme),
                         )
                     }
                 }
@@ -148,11 +162,18 @@ fun MainScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        if (dialogState.showDialog && dialogState.selectedDevice != null) {
+        if (showConnectDialog && selectedDeviceForConnect != null) {
             ConnectionConfirmationDialog(
-                device = dialogState.selectedDevice!!,
-                onConfirm = { viewModel.onConfirmConnect() },
-                onDismiss = { viewModel.onCancelConnect() },
+                device = selectedDeviceForConnect!!,
+                onConfirm = {
+                    viewModel.connectToDevice(selectedDeviceForConnect!!)
+                    showConnectDialog = false
+                    selectedDeviceForConnect = null
+                },
+                onDismiss = {
+                    showConnectDialog = false
+                    selectedDeviceForConnect = null
+                },
             )
         }
     }

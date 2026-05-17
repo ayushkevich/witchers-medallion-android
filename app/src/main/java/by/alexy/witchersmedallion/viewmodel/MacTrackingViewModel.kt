@@ -2,15 +2,17 @@ package by.alexy.witchersmedallion.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import by.alexy.witchersmedallion.R
 import by.alexy.witchersmedallion.domain.BleDevice
+import by.alexy.witchersmedallion.domain.UiText
 import by.alexy.witchersmedallion.repository.MedallionRepository
 import by.alexy.witchersmedallion.repository.bluetooth.BleRepository
 import by.alexy.witchersmedallion.ui.model.MacDevice
-import by.alexy.witchersmedallion.ui.state.DialogState
 import by.alexy.witchersmedallion.ui.state.MacTrackingUiState
 import by.alexy.witchersmedallion.util.MacAddressUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,10 +26,7 @@ class MacTrackingViewModel @Inject constructor(
     private val bleRepository: BleRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MacTrackingUiState())
-    val uiState = _uiState.asStateFlow()
-
-    private val _dialogState = MutableStateFlow(DialogState())
-    val dialogState = _dialogState.asStateFlow()
+    val uiState: StateFlow<MacTrackingUiState> = _uiState.asStateFlow()
 
     init {
         loadRegisteredMacs()
@@ -48,7 +47,10 @@ class MacTrackingViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        errorMessage = "Ошибка загрузки MAC-адресов: ${e.message}",
+                        errorMessage = UiText.fromStringResource(
+                            R.string.error_loading_macs,
+                            e.message ?: "",
+                        ),
                     )
                 }
             } finally {
@@ -61,7 +63,7 @@ class MacTrackingViewModel @Inject constructor(
         if (mac.isBlank() || mac.length < 17) {
             _uiState.update {
                 it.copy(
-                    errorMessage = "Неверный формат MAC-адреса",
+                    errorMessage = UiText.fromStringResource(R.string.error_invalid_mac_format),
                 )
                 return
             }
@@ -71,7 +73,7 @@ class MacTrackingViewModel @Inject constructor(
         if (!MacAddressUtils.isValidMacAddress(cleanMac)) {
             _uiState.update {
                 it.copy(
-                    errorMessage = "Invalid MAC format",
+                    errorMessage = UiText.fromStringResource(R.string.error_invalid_mac_characters),
                 )
                 return
             }
@@ -124,18 +126,7 @@ class MacTrackingViewModel @Inject constructor(
         }
     }
 
-    fun onDeviceClick(device: BleDevice) {
-        _dialogState.update {
-            DialogState(
-                showDialog = true,
-                selectedDevice = device,
-            )
-        }
-    }
-
-    fun onConfirmAddDevice() {
-        val device = _dialogState.value.selectedDevice ?: return
-
+    fun confirmAddDevice(device: BleDevice) {
         viewModelScope.launch {
             val macAddresses = medallionRepository.getRegisteredMacAddresses().toMutableList()
             if (!macAddresses.contains(device.address)) {
@@ -150,17 +141,15 @@ class MacTrackingViewModel @Inject constructor(
                     )
                 }
             }
-
-            _dialogState.update { it.copy(showDialog = false, selectedDevice = null) }
         }
     }
 
-    fun onCancelAddDevice() {
-        _dialogState.update { it.copy(showDialog = false, selectedDevice = null) }
+    fun onMacInputChange(value: String) {
+        _uiState.update { it.copy(macInput = value) }
     }
 
-    fun onSearchQueryChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 
     fun isDynamicMac(address: String): Boolean = MacAddressUtils.isDynamicMac(address)

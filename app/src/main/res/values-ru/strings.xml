@@ -52,6 +52,9 @@
     <!-- Devices search -->
     <string name="device_name">Имя устройства</string>
     <string name="signal_strength">Сила сигнала</string>
+    <string name="signal_strength_with_rssi">Сила сигнала: %1$d dBm</string>
+    <string name="rssi_unit">%1$d dBm</string>
+    <string name="slider_label_format">%1$s: %2$d dBm</string>
     
     <!-- Dialogs -->
     <string name="confirm_connection">Подтверждение подключения</string>
@@ -60,4 +63,17 @@
     <string name="no">Нет</string>
     <string name="error">Ошибка</string>
     <string name="ok">OK</string>
+
+    <!-- Error messages -->
+    <string name="error_loading_macs">Ошибка загрузки MAC-адресов: %1$s</string>
+    <string name="error_invalid_mac_format">Неверный формат MAC-адреса</string>
+    <string name="error_invalid_mac_characters">Недопустимые символы MAC</string>
+    <string name="error_general">Произошла ошибка: %1$s</string>
+
+    <!-- BLE Scan Errors -->
+    <string name="scan_error_bluetooth_disabled">Bluetooth выключен</string>
+    <string name="scan_error_scanner_unavailable">Сканер недоступен</string>
+    <string name="scan_error_connection_failed">Ошибка подключения</string>
+    <string name="scan_error_gatt_error">Ошибка GATT</string>
+    <string name="scan_error_timeout">Таймаут операции</string>
 </resources>

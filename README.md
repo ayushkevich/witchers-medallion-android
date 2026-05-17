@@ -99,3 +99,12 @@ app/src/main/java/by/alexy/witchersmedallion/
 ## License
 
 Apache License 2.0
+
+## Bugs
+- Hardcoded values and magic numbers
+- Search by service should be applicable for the main tab only, the search by mac should be applied to any device with static mac(static + dynamic macs should be visible). If user attemts to add dynamic mac - error message should be displayed.
+- Mac Address input should not be visible near the scan devices button, only nead Add mac
+- Calibration. Save to medallion should be located under the back to manual calibration, now it's located in the bottom for the auto calibration and on the right side for manual calibration
+- Current RSSI should not be visible if device is not connected.
+- On the autocalibration screen user should see message that informs that device is not connected. If user clicks on the connection button, user should be moved to the main screen and search should be started.
+- Main view model is in imperative style, other screens are in the reactive style. The single style should be followed.

@@ -49,7 +49,7 @@ fun AutoCalibrationComponent(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(stringResource(R.string.hot_zone_rssi))
-                Text("$hotRssi dBm", modifier = Modifier.padding(top = 4.dp))
+                Text(stringResource(R.string.rssi_unit, hotRssi), modifier = Modifier.padding(top = 4.dp))
             }
         }
         Spacer(modifier = Modifier.padding(8.dp))
@@ -59,7 +59,7 @@ fun AutoCalibrationComponent(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(stringResource(R.string.warm_zone_rssi))
-                Text("$warmRssi dBm", modifier = Modifier.padding(top = 4.dp))
+                Text(stringResource(R.string.rssi_unit, warmRssi), modifier = Modifier.padding(top = 4.dp))
             }
         }
 
@@ -70,7 +70,7 @@ fun AutoCalibrationComponent(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(stringResource(R.string.cold_zone_rssi))
-                Text("$coldRssi dBm", modifier = Modifier.padding(top = 4.dp))
+                Text(stringResource(R.string.rssi_unit, coldRssi), modifier = Modifier.padding(top = 4.dp))
             }
         }
     }

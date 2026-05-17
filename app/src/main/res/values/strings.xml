@@ -38,8 +38,8 @@
     <!-- MAC Tracking -->
     <string name="mac_address">MAC Address</string>
     <string name="add_mac">Add MAC</string>
-    <string name="dynamic_mac">D</string>
-    <string name="static_mac">D</string>
+    <string name="dynamic_mac">Dynamic</string>
+    <string name="static_mac">Static</string>
     <string name="remove_mac">Remove MAC</string>
     <string name="mac_tracked_devices">Tracked Devices</string>
     <string name="mac_search">Search</string>
@@ -52,6 +52,9 @@
     <!-- Devices search -->
     <string name="device_name">Name</string>
     <string name="signal_strength">Signal Strength</string>
+    <string name="signal_strength_with_rssi">Signal Strength: %1$d dBm</string>
+    <string name="rssi_unit">%1$d dBm</string>
+    <string name="slider_label_format">%1$s: %2$d dBm</string>
 
     <!-- Dialogs -->
     <string name="confirm_connection">Confirm Connection</string>
@@ -60,4 +63,17 @@
     <string name="no">No</string>
     <string name="error">Error</string>
     <string name="ok">OK</string>
+
+    <!-- Error messages -->
+    <string name="error_loading_macs">Error loading MAC addresses: %1$s</string>
+    <string name="error_invalid_mac_format">Invalid MAC address format</string>
+    <string name="error_invalid_mac_characters">Invalid MAC characters</string>
+    <string name="error_general">An error occurred: %1$s</string>
+
+    <!-- BLE Scan Errors -->
+    <string name="scan_error_bluetooth_disabled">Bluetooth is disabled</string>
+    <string name="scan_error_scanner_unavailable">Scanner unavailable</string>
+    <string name="scan_error_connection_failed">Connection failed</string>
+    <string name="scan_error_gatt_error">GATT error</string>
+    <string name="scan_error_timeout">Operation timed out</string>
 </resources>

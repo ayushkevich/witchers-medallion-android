@@ -2,6 +2,7 @@ package by.alexy.witchersmedallion.ui.screen.component.calibration
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,7 +20,7 @@ fun ManualCalibrationComponent(
     onHotRssiChange: (Int) -> Unit,
 ) {
     SliderWithLabelInt(
-        label = stringResource(R.string.cold_warm),
+        label = { Text(stringResource(R.string.cold_warm)) },
         value = coldRssi,
         onValueChange = { onColdRssiChange(it) },
     )
@@ -27,7 +28,7 @@ fun ManualCalibrationComponent(
     Spacer(modifier = Modifier.height(16.dp))
 
     SliderWithLabelInt(
-        label = stringResource(R.string.warm_hot),
+        label = { Text(stringResource(R.string.warm_hot)) },
         value = warmRssi,
         onValueChange = { onWarmRssiChange(it) },
     )
@@ -35,7 +36,7 @@ fun ManualCalibrationComponent(
     Spacer(modifier = Modifier.height(16.dp))
 
     SliderWithLabelInt(
-        label = stringResource(R.string.hot_found),
+        label = { Text(stringResource(R.string.hot_found)) },
         value = hotRssi,
         onValueChange = { onHotRssiChange(it) },
     )
