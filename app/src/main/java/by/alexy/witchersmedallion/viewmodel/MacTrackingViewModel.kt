@@ -3,6 +3,7 @@ package by.alexy.witchersmedallion.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexy.witchersmedallion.R
+import by.alexy.witchersmedallion.config.BleConfig
 import by.alexy.witchersmedallion.domain.BleDevice
 import by.alexy.witchersmedallion.domain.UiText
 import by.alexy.witchersmedallion.repository.MedallionRepository
@@ -40,7 +41,7 @@ class MacTrackingViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         trackedDevices = registeredMacs.map { mac ->
-                            MacDevice(mac, -60)
+                            MacDevice(mac, BleConfig.DEFAULT_INITIAL_RSSI)
                         },
                     )
                 }
@@ -88,7 +89,7 @@ class MacTrackingViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         trackedDevices = it.trackedDevices.toMutableList().apply {
-                            add(MacDevice(cleanMac, -60))
+                            add(MacDevice(cleanMac, BleConfig.DEFAULT_INITIAL_RSSI))
                         },
                     )
                 }

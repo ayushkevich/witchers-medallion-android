@@ -60,11 +60,11 @@ fun SwipeableTabs(
                 }
             }
 
-            HorizontalPager(state = pagerState) { _ ->
+            HorizontalPager(state = pagerState) { page ->
                 Box(modifier = Modifier.fillMaxSize()) {
-                    when (pagerState.currentPage) {
+                    when (page) {
                         0 -> MainScreen(mainViewModel)
-                        1 -> CalibrationScreen(calibrationViewModel)
+                        1 -> CalibrationScreen(calibrationViewModel, page)
                         2 -> MacTrackingScreen(macTrackingViewModel)
                     }
                 }

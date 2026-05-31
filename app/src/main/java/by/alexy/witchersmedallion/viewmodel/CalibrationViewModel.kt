@@ -2,17 +2,23 @@ package by.alexy.witchersmedallion.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import by.alexy.witchersmedallion.config.BleConfig
 import by.alexy.witchersmedallion.domain.MedallionCalibrationSettings
 import by.alexy.witchersmedallion.repository.MedallionRepository
 import by.alexy.witchersmedallion.ui.state.AutoCalibrationStep
 import by.alexy.witchersmedallion.ui.state.CalibrationUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class CalibrationViewModel @Inject constructor(
@@ -22,49 +28,36 @@ class CalibrationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CalibrationUiState())
     val uiState: StateFlow<CalibrationUiState> = _uiState.asStateFlow()
 
+    private var pollingJob: Job? = null
+
     init {
         loadCalibrationSettings()
     }
 
-    private fun loadCalibrationSettings() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                val settings = medallionRepository.getCalibrationSettings()
-                val currentRssi = medallionRepository.getMedallionRssi()
+    override fun onCleared() {
+        stopRssiPolling()
+    }
 
-                _uiState.update { state ->
-                    state.copy(
-                        currentRssi = currentRssi,
-                        calibrationSettings = settings,
-                        coldRssi = settings?.coldRssi ?: state.coldRssi,
-                        warmRssi = settings?.warmRssi ?: state.warmRssi,
-                        hotRssi = settings?.hotRssi ?: state.hotRssi,
-                        isLoading = false,
-                    )
+    fun startRssiPolling() {
+        if (pollingJob?.isActive == true) return
+
+        pollingJob = viewModelScope.launch {
+            while (isActive) {
+                try {
+                    val currentRssi = medallionRepository.getMedallionRssi()
+                    _uiState.update { it.copy(currentRssi = currentRssi) }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message,
-                    )
-                }
+                delay(BleConfig.DEFAULT_POLLING_INTERVAL_MS.milliseconds)
             }
         }
     }
 
-    fun refreshCurrentRssi() {
-        viewModelScope.launch {
-            try {
-                val currentRssi = medallionRepository.getMedallionRssi()
-                _uiState.update { it.copy(currentRssi = currentRssi) }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(errorMessage = e.message)
-                }
-            }
-        }
+    fun stopRssiPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
     }
 
     fun updateColdRssi(value: Int) {
@@ -82,9 +75,9 @@ class CalibrationViewModel @Inject constructor(
     fun setDefaultValues() {
         _uiState.update {
             it.copy(
-                coldRssi = -70,
-                warmRssi = -60,
-                hotRssi = -45,
+                coldRssi = BleConfig.DEFAULT_COLD_RSSI,
+                warmRssi = BleConfig.DEFAULT_WARM_RSSI,
+                hotRssi = BleConfig.DEFAULT_HOT_RSSI,
             )
         }
     }
@@ -182,5 +175,31 @@ class CalibrationViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    private fun loadCalibrationSettings() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                val settings = medallionRepository.getCalibrationSettings()
+
+                _uiState.update { state ->
+                    state.copy(
+                        calibrationSettings = settings,
+                        coldRssi = settings?.coldRssi ?: state.coldRssi,
+                        warmRssi = settings?.warmRssi ?: state.warmRssi,
+                        hotRssi = settings?.hotRssi ?: state.hotRssi,
+                        isLoading = false,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message,
+                    )
+                }
+            }
+        }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,8 +29,16 @@ import by.alexy.witchersmedallion.ui.state.AutoCalibrationStep
 import by.alexy.witchersmedallion.viewmodel.CalibrationViewModel
 
 @Composable
-fun CalibrationScreen(viewModel: CalibrationViewModel) {
+fun CalibrationScreen(viewModel: CalibrationViewModel, currentPage: Int = 0) {
     val uiState by viewModel.uiState.collectAsState()
+
+    DisposableEffect(currentPage) {
+        viewModel.startRssiPolling()
+
+        onDispose {
+            viewModel.stopRssiPolling()
+        }
+    }
 
     Column(
         modifier = Modifier
